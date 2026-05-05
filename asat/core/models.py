@@ -167,7 +167,7 @@ class Report:
         report.append("\n")
         
         # Findings by Phase
-        phases = ['Network', 'Subdomain', 'Web']
+        phases = ['Network', 'Subdomain', 'Web', 'API', 'Cloud']
         for phase in phases:
             phase_findings = [f for f in self.findings if f.phase == phase]
             if phase_findings:
