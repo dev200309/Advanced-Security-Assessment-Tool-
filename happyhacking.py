@@ -2,7 +2,7 @@
 """
 Advanced Security Assessment Tool (ASAT) 
 Author: Dev Somani
-Happy Hacking! 🚀
+Happy Hacking! 🚀   
 """
 
 import sys
@@ -19,4 +19,4 @@ def main():
     app.run()
 
 if __name__ == "__main__":
-    main()
+    main() 
