@@ -195,3 +195,229 @@ class Report:
             'findings': [f.to_dict() for f in self.findings]
         }, indent=2)
 
+    def generate_html_report(self):
+        """Generate a beautiful, interactive HTML report that can be printed to PDF."""
+        end_time = datetime.datetime.now()
+        duration = end_time - self.start_time
+        
+        # Calculate summary numbers
+        total = len(self.findings)
+        critical = self.scan_summary.get(RiskRating.CRITICAL, 0)
+        high = self.scan_summary.get(RiskRating.HIGH, 0)
+        medium = self.scan_summary.get(RiskRating.MEDIUM, 0)
+        low = self.scan_summary.get(RiskRating.LOW, 0)
+        info = self.scan_summary.get(RiskRating.INFO, 0)
+
+        html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASAT Report: {self.target}</title>
+    <style>
+        :root {{
+            --bg: #0f111a;
+            --surface: #1a1d27;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border: #2d3748;
+            --critical: #dc2626;
+            --high: #ea580c;
+            --medium: #ca8a04;
+            --low: #2563eb;
+            --info: #475569;
+            --accent: #ef4444;
+        }}
+        * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 2rem;
+        }}
+        .container {{ max-width: 1000px; margin: 0 auto; }}
+        header {{
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }}
+        h1 {{ color: var(--accent); font-size: 2.5rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 0.5rem; }}
+        .meta-info {{ color: var(--text-muted); font-family: monospace; font-size: 0.95rem; }}
+        .summary-dashboard {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }}
+        .stat-card {{
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }}
+        .stat-value {{ font-size: 2.5rem; font-weight: bold; margin-bottom: 0.5rem; }}
+        .stat-label {{ text-transform: uppercase; font-size: 0.8rem; font-weight: 600; letter-spacing: 1px; color: var(--text-muted); }}
+        
+        .val-total {{ color: var(--text); }}
+        .val-critical {{ color: var(--critical); }}
+        .val-high {{ color: var(--high); }}
+        .val-medium {{ color: var(--medium); }}
+        .val-low {{ color: var(--low); }}
+        .val-info {{ color: var(--info); }}
+        
+        .finding-card {{
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            page-break-inside: avoid;
+        }}
+        .finding-header {{
+            padding: 1.2rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.2);
+        }}
+        .finding-title {{ font-size: 1.2rem; font-weight: 600; color: var(--text); }}
+        .badge {{
+            padding: 0.3rem 0.8rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #fff;
+        }}
+        .badge.critical {{ background: var(--critical); }}
+        .badge.high {{ background: var(--high); }}
+        .badge.medium {{ background: var(--medium); }}
+        .badge.low {{ background: var(--low); }}
+        .badge.info {{ background: var(--info); }}
+        
+        .border-critical {{ border-left-color: var(--critical); }}
+        .border-high {{ border-left-color: var(--high); }}
+        .border-medium {{ border-left-color: var(--medium); }}
+        .border-low {{ border-left-color: var(--low); }}
+        .border-info {{ border-left-color: var(--info); }}
+        
+        .finding-body {{ padding: 1.5rem; }}
+        .section-title {{ font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 0.5rem; font-weight: bold; }}
+        .finding-section {{ margin-bottom: 1.5rem; }}
+        .finding-section:last-child {{ margin-bottom: 0; }}
+        p {{ color: var(--text); font-size: 0.95rem; }}
+        ul {{ list-style-position: inside; color: var(--text); font-size: 0.95rem; padding-left: 1rem; }}
+        li {{ margin-bottom: 0.25rem; font-family: monospace; }}
+        
+        .phase-header {{
+            margin: 3rem 0 1.5rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }}
+        
+        /* Print Styles for PDF */
+        @media print {{
+            body {{ background: #ffffff; color: #000000; }}
+            .stat-card, .finding-card {{ box-shadow: none; border-color: #e2e8f0; background: #f8fafc; }}
+            .finding-header {{ background: #f1f5f9; }}
+            .meta-info, .stat-label, .section-title, p, ul {{ color: #334155; }}
+            .val-total {{ color: #0f172a; }}
+            h1 {{ color: #dc2626; }}
+            .phase-header {{ color: #dc2626; border-bottom-color: #cbd5e1; }}
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ASAT Security Report</h1>
+            <div class="meta-info">
+                Target: {self.target}<br>
+                Scan Started: {self.start_time.strftime('%Y-%m-%d %H:%M:%S')}<br>
+                Duration: {duration}
+            </div>
+        </header>
+
+        <div class="summary-dashboard">
+            <div class="stat-card">
+                <div class="stat-value val-total">{total}</div>
+                <div class="stat-label">Total Findings</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value val-critical">{critical}</div>
+                <div class="stat-label">Critical</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value val-high">{high}</div>
+                <div class="stat-label">High</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value val-medium">{medium}</div>
+                <div class="stat-label">Medium</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value val-low">{low}</div>
+                <div class="stat-label">Low</div>
+            </div>
+        </div>
+"""
+
+        # Generate findings by phase
+        phases = ['Network', 'Subdomain', 'Web', 'API', 'Cloud']
+        for phase in phases:
+            phase_findings = [f for f in self.findings if f.phase == phase]
+            if not phase_findings:
+                continue
+                
+            html += f'<h2 class="phase-header">{phase} Phase</h2>\n'
+            
+            for finding in phase_findings:
+                risk_lower = finding.risk_rating.lower()
+                
+                # Format evidence list
+                evidence_html = ""
+                if finding.evidence:
+                    evidence_items = "".join([f"<li>{e}</li>" for e in finding.evidence[:5]])
+                    evidence_html = f"""
+                    <div class="finding-section">
+                        <div class="section-title">Evidence</div>
+                        <ul>{evidence_items}</ul>
+                    </div>"""
+
+                html += f"""
+        <div class="finding-card border-{risk_lower}">
+            <div class="finding-header">
+                <div class="finding-title">{finding.title}</div>
+                <span class="badge {risk_lower}">{finding.risk_rating}</span>
+            </div>
+            <div class="finding-body">
+                <div class="finding-section">
+                    <div class="section-title">Description</div>
+                    <p>{finding.description}</p>
+                </div>
+                {evidence_html}
+                <div class="finding-section">
+                    <div class="section-title">Remediation</div>
+                    <p>{finding.remediation}</p>
+                </div>
+            </div>
+        </div>
+"""
+
+        html += """
+    </div>
+</body>
+</html>"""
+        return html
+
+

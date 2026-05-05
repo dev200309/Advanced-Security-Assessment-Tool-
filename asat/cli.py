@@ -83,8 +83,8 @@ Examples:
         parser.add_argument('-o', '--output',
                           help='Output file for report (if not specified, generates timestamped file)')
         
-        parser.add_argument('--format', choices=['txt', 'json'], default='txt',
-                          help='Report format (default: txt)')
+        parser.add_argument('--format', choices=['txt', 'json', 'html'], default='txt',
+                            help='Report format (txt, json, or html)')
         
         parser.add_argument('-v', '--verbose', action='store_true',
                           help='Enable verbose output')
@@ -151,6 +151,8 @@ Examples:
         # Generate report content
         if self.args.format == 'json':
             report_content = self.report.generate_json_report()
+        elif self.args.format == 'html':
+            report_content = self.report.generate_html_report()
         else:
             report_content = self.report.generate_text_report()
         
