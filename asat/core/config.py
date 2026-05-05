@@ -3,24 +3,27 @@ from colorama import Fore, Style, Back
 VERSION = "1.0"
 AUTHOR = "Dev Somani"
 BANNER = f"""
-{Fore.CYAN}
-╔══════════════════════════════════════════════════════════════╗
-║                                                              ║
-║     █████╗ ███████╗ █████╗ ████████╗    ██╗   ██╗██████╗   ║
-║    ██╔══██╗██╔════╝██╔══██╗╚══██╔══╝    ██║   ██║██╔══██╗  ║
-║    ███████║███████╗███████║   ██║       ██║   █�█████╔╝  ║
-║    ██╔══██║╚════██║██╔══██║   ██║       ██║   ██║██╔══██╗  ║
-║    ██║  ██║███████║██║  ██║   ██║       ╚██████╔██████╔╝  ║
-║    ╚═╝  ╚══════╚═╝  ╚═╝   ╚═╝        ╚═════╝╚═════╝   ║
-║                                                              ║
-║           Advanced Security Assessment Tool v{VERSION}                ║
-║                    Happy Hacking by {AUTHOR}                    ║
-║                                                              ║
-╚══════════════════════════════════════════════════════════════════╝
+{Fore.RED}{Style.BRIGHT}
+ ╔════════════════════════════════════════════════════════════╗
+ ║  ░▒▓██████████████████████████████████████████████████▓▒░  ║
+ ║                                                            ║
+ ║              █████╗ ███████╗ █████╗ ████████╗              ║
+ ║             ██╔══██╗██╔════╝██╔══██╗╚══██╔══╝              ║
+ ║             ███████║███████╗███████║   ██║                 ║
+ ║             ██╔══██║╚════██║██╔══██║   ██║                 ║
+ ║             ██║  ██║███████║██║  ██║   ██║                 ║
+ ║             ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝   ╚═╝                 ║
+ ║                                                            ║
+ ║         Advanced Security Assessment Tool v{VERSION}       ║
+ ║                  Happy Hacking by {AUTHOR}                 ║
+ ║                                                            ║
+ ║  ░▒▓██████████████████████████████████████████████████▓▒░  ║
+ ╚════════════════════════════════════════════════════════════╝
+{Style.RESET_ALL}
 {Fore.YELLOW}
-[!] DISCLAIMER: This tool is for authorized security testing only!
-[!] Unauthorized use against systems you don't own is illegal!
-[!] By using this tool, you agree to use it responsibly and ethically.
+ [!] DISCLAIMER: This tool is for authorized security testing only!
+ [!] Unauthorized use against systems you don't own is illegal!
+ [!] By using this tool, you agree to use it responsibly and ethically.
 {Style.RESET_ALL}
 """
 
