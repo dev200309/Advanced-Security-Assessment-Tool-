@@ -143,6 +143,12 @@ sudo python3 happyhacking.py -t example.com --phase 1 --phase 3
 ASAT v1.0 generates professional reports (including CVSS scoring mapped to vulnerabilities). By default, the tool outputs a `.txt` report file with a timestamp in the current directory if run successfully.
 You can format it as JSON, HTML, or specify a custom filename.
 
+**Save as HTML (Interactive Dashboard & PDF Ready):**
+```bash
+sudo python3 happyhacking.py -t example.com --all --format html -o output_report.html
+```
+> **Tip for PDFs:** To get a high-quality PDF, simply open the generated `.html` file in Chrome/Firefox/Edge and press `Ctrl+P` (or `Cmd+P`), then select "Save as PDF". The HTML template includes optimized `@media print` CSS styles for beautiful, high-contrast monochrome PDFs.
+
 **Save as JSON format:**
 ```bash
 sudo python3 happyhacking.py -t example.com --all --format json -o output_report.json
