@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASAT Report: https://evil.com</title>
+    <style>
+        :root {
+            --bg: #0f111a;
+            --surface: #1a1d27;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border: #2d3748;
+            --critical: #dc2626;
+            --high: #ea580c;
+            --medium: #ca8a04;
+            --low: #2563eb;
+            --info: #475569;
+            --accent: #ef4444;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        header {
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        h1 { color: var(--accent); font-size: 2.5rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 0.5rem; }
+        .meta-info { color: var(--text-muted); font-family: monospace; font-size: 0.95rem; }
+        .summary-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .stat-value { font-size: 2.5rem; font-weight: bold; margin-bottom: 0.5rem; }
+        .stat-label { text-transform: uppercase; font-size: 0.8rem; font-weight: 600; letter-spacing: 1px; color: var(--text-muted); }
+        
+        .val-total { color: var(--text); }
+        .val-critical { color: var(--critical); }
+        .val-high { color: var(--high); }
+        .val-medium { color: var(--medium); }
+        .val-low { color: var(--low); }
+        .val-info { color: var(--info); }
+        
+        .finding-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            page-break-inside: avoid;
+        }
+        .finding-header {
+            padding: 1.2rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.2);
+        }
+        .finding-title { font-size: 1.2rem; font-weight: 600; color: var(--text); }
+        .badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #fff;
+        }
+        .badge.critical { background: var(--critical); }
+        .badge.high { background: var(--high); }
+        .badge.medium { background: var(--medium); }
+        .badge.low { background: var(--low); }
+        .badge.info { background: var(--info); }
+        
+        .border-critical { border-left-color: var(--critical); }
+        .border-high { border-left-color: var(--high); }
+        .border-medium { border-left-color: var(--medium); }
+        .border-low { border-left-color: var(--low); }
+        .border-info { border-left-color: var(--info); }
+        
+        .finding-body { padding: 1.5rem; }
+        .section-title { font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 0.5rem; font-weight: bold; }
+        .finding-section { margin-bottom: 1.5rem; }
+        .finding-section:last-child { margin-bottom: 0; }
+        p { color: var(--text); font-size: 0.95rem; }
+        ul { list-style-position: inside; color: var(--text); font-size: 0.95rem; padding-left: 1rem; }
+        li { margin-bottom: 0.25rem; font-family: monospace; }
+        
+        .phase-header {
+            margin: 3rem 0 1.5rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        /* Print Styles for PDF */
+        @media print {
+            body { background: #ffffff; color: #000000; }
+            .stat-card, .finding-card { box-shadow: none; border-color: #e2e8f0; background: #f8fafc; }
+            .finding-header { background: #f1f5f9; }
+            .meta-info, .stat-label, .section-title, p, ul { color: #334155; }
+            .val-total { color: #0f172a; }
+            h1 { color: #dc2626; }
+            .phase-header { color: #dc2626; border-bottom-color: #cbd5e1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ASAT Security Report</h1>
+            <div class="meta-info">
+                Target: https://evil.com<br>
+                Scan Started: 2026-05-05 05:00:12<br>
+                Duration: 0:16:20.720736
+            </div>
+        </header>
+
+        <div class="summary-dashboard">
+            <div class="stat-card">
+                <div class="stat-value val-total">25</div>
+                <div class="stat-label">Total Findings</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value val-critical">0</div>
+                <div class="stat-label">Critical</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value val-high">5</div>
+                <div class="stat-label">High</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value val-medium">4</div>
+                <div class="stat-label">Medium</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value val-low">5</div>
+                <div class="stat-label">Low</div>
+            </div>
+        </div>
+<h2 class="phase-header">Network Phase</h2>
+
+        <div class="finding-card border-info">
+            <div class="finding-header">
+                <div class="finding-title">Network Sweep — Live Hosts</div>
+                <span class="badge info">INFO</span>
+            </div>
+            <div class="finding-body">
+                <div class="finding-section">
+                    <div class="section-title">Description</div>
+                    <p>Discovered 256 live host(s) in 66.96.146.0/24</p>
+                </div>
+                
+                    <div class="finding-section">
+                        <div class="section-title">Evidence</div>
+                        <ul><li>66.96.146.0</li><li>66.96.146.1</li><li>66.96.146.10</li><li>66.96.146.100</li><li>66.96.146.101</li></ul>
+                    </div>
+                <div class="finding-section">
+                    <div class="section-title">Remediation</div>
+                    <p>N/A - This is informational</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="finding-card border-high">
+            <div class="finding-header">
+                <div class="finding-title">Dangerous port open: 21</div>
+                <span class="badge high">HIGH</span>
+            </div>
+            <div class="finding-body">
+                <div class="finding-section">
+                    <div class="section-title">Description</div>
+                    <p>Port 21 (ftp) is open. This service is known to have security risks.</p>
+                </div>
+                
+                    <div class="finding-section">
+                        <div class="section-title">Evidence</div>
+                        <ul><li>Service: ftp, Version: </li></ul>
+                    </div>
+                <div class="finding-section">
+                    <div class="section-title">Remediation</div>
+                    <p>Close the port if not needed. If required, ensure it's properly secured and behind firewall.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="finding-card border-high">
+            <div class="finding-header">
+                <div class="finding-title">Nmap Vuln Script: smtp-vuln-cve2010-4344 (port 587)</div>
+                <span class="badge high">HIGH</span>
+            </div>
+            <div class="finding-body">
+                <div class="finding-section">
+                    <div class="section-title">Description</div>
+                    <p>Nmap vulnerability script detected issue on port 587</p>
+                </div>
+                
+                    <div class="finding-section">
+                        <div class="section-title">Evidence</div>
+                        <ul><li>
+  The SMTP server is not Exim: NOT VULNERABLE
+</li></ul>
+                    </div>
+                <div class="finding-section">
+                    <div class="section-title">Remediation</div>
+                    <p>Investigate and remediate the identified vulnerability</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="finding-card border-high">
+            <div class="finding-header">
+                <div class="finding-title">Weak SSL/TLS Configuration (port 443)</div>
+                <span class="badge high">HIGH</span>
+            </div>
+            <div class="finding-body">
+                <div class="finding-section">
+                    <div class="section-title">Description</div>
+                    <p>sslscan detected weak ciphers or protocols</p>
+                </div>
+                
+                    <div class="finding-section">
+                        <div class="section-title">Evidence</div>
+                        <ul><li>SSLv2     [32mdisabled[0m</li><li>SSLv3     [32mdisabled[0m</li><li>TLSv1.0   [32mdisabled[0m</li><li>TLSv1.1   [32mdisabled[0m</li></ul>
+                    </div>
+                <div class="finding-section">
+                    <div class="section-title">Remediation</div>
+                    <p>Disable weak ciphers (RC4, DES, NULL) and legacy protocols (SSLv3, TLS 1.0/1.1)</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="finding-card border-info">
+            <div class="finding-header">
+                <div class="finding-title">Directories Discovered (port 443)</div>
+                <span class="badge info">INFO</span>
+            </div>
+            <div class="finding-body">
+                <div class="finding-section">
+                    <div class="section-title">Description</div>
+                    <p>Directory fuzzing found 13 path(s)</p>
+                </div>
+                
+                    <div class="finding-section">
+                        <div class="section-title">Evidence</div>
+                        <ul><li>.hta</li><li>.htaccess</li><li>.htpasswd</li><li>_private</li><li>archives</li></ul>
+                    </div>
+                <div class="finding-section">
+                    <div class="section-title">Remediation</div>
+                    <p>Review exposed paths for sensitive content</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="finding-card border-info">
+            <div class="finding-header">
+                <div class="finding-title">Firewall/IDS Detected</div>
+                <span class="badge info">INFO</span>
+            </div>
+            <div class="finding-body">
+                <div class="finding-section">
+                    <div class="section-title">Description</div>
+                    <p>Inconsistent port states across different scan types suggest firewall or IDS presence</p>
+                </div>
+                
+                <div class="finding-section">
+                    <div class="section-title">Remediation</div>
+                    <p>N/A - This information can be used to plan further testing strategies</p>
+                </div>
+            </div>
+        </div>
+<h2 class="phase-header">Subdomain Phase</h2>
+
+        <div class="finding-card border-info">
+            <div class="finding-header">
+                <div class="finding-title">DNS A Record Found</div>
+                <span class="badge info">INFO</span>
+            </div>
+            <div class="finding-body">
+                <div class="finding-section">
+                    <div class="section-title">Description</div>
+                    <p>DNS A record: 66.96.146.129</p>
+                </div>
+                
+                <div class="finding-section">
+                    <div class="section-title">Remediation</div>
+                    <p>N/A - This is informational</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="finding-card border-info">
+            <div class="finding-header">
+                <div class="finding-title">DNS MX Record Found</div>
+                <span class="badge info">INFO</span>
+            </div>
+            <div class="finding-body">
+                <div class="finding-section">
+                    <div class="section-title">Description</div>
+                    <p>DNS MX record: 30 mx.evil.com.</p>
+                </div>
+                
+                <div class="finding-section">
+                    <div class="section-title">Remediation</div>
+                    <p>N/A - This is informational</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="finding-card border-info">
+            <div class="finding-header">
+                <div class="finding-title">DNS NS Record Found</div>
+                <span class="badge info">INFO</span>
+            </div>
+            <div class="finding-body">
+                <div class="finding-section">
+                    <div class="section-title">Description</div>
+                    <p>DNS NS record: ns1.verio.com.</p>
+                </div>
+                
+                <div class="finding-section">
+                    <div class="section-title">Remediation</div>
+                    <p>N/A - This is informational</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="finding-card border-info">
+            <div class="finding-header">
+                <div class="finding-title">DNS NS Record Found</div>
+                <span class="badge info">INFO</span>
+            </div>
+            <div class="finding-body">
+                <div class="finding-section">
+                    <div class="section-title">Description</div>
+                    <p>DNS NS record: ns2.verio.com.</p>
+                </div>
+                
+                <div class="finding-section">
+                    <div class="section-title">Remediation</div>
+                    <p>N/A - This is informational</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="finding-card border-info">
+            <div class="finding-header">
+                <div class="finding-title">DNS TXT Record Found</div>
+                <span class="badge info">INFO</span>
+            </div>
+            <div class="finding-body">
+                <div class="finding-section">
+                    <div class="section-title">Description</div>
+                    <p>DNS TXT record: "v=spf1 ip4:66.96.128.0/18 include:websitewelcome.com ?all"</p>
+                </div>
+                
+                <div class="finding-section">
+                    <div class="section-title">Remediation</div>
+                    <p>N/A - This is informational</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="finding-card border-info">
+            <div class="finding-header">
+                <div class="finding-title">DNS SOA Record Found</div>
+                <span class="badge info">INFO</span>
+            </div>
+            <div class="finding-body">
+                <div class="finding-section">
+                    <div class="section-title">Description</div>
+                    <p>DNS SOA record: ns1.verio.com. dnsadmin.verio.com. 2016111729 10800 3600 604800 3600</p>
+                </div>
+                
+                <div class="finding-section">
+                    <div class="section-title">Remediation</div>
+                    <p>N/A - This is informational</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="finding-card border-info">
+            <div class="finding-header">
+                <div class="finding-title">Subdomains Discovered</div>
+                <span class="badge info">INFO</span>
+            </div>
+            <div class="finding-body">
+                <div class="finding-section">
+                    <div class="section-title">Description</div>
+                    <p>Found 116 subdomains through brute-forcing</p>
+                </div>
+                
+                    <div class="finding-section">
+                        <div class="section-title">Evidence</div>
+                        <ul><li>www.evil.com</li><li>ns1.evil.com</li><li>smtp.evil.com</li><li>pop.evil.com</li><li>pop3.evil.com</li></ul>
+                    </div>
+                <div class="finding-section">
+                    <div class="section-title">Remediation</div>
+                    <p>Review discovered subdomains and ensure they are properly secured</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="finding-card border-info">
+            <div class="finding-header">
+                <div class="finding-title">ASN Information Discovered</div>
+                <span class="badge info">INFO</span>
+            </div>
+            <div class="finding-body">
+                <div class="finding-section">
+                    <div class="section-title">Description</div>
+                    <p>Target is hosted on AS29873 Newfold Digital, Inc.</p>
+                </div>
+                
+                <div class="finding-section">
+                    <div class="section-title">Remediation</div>
+                    <p>N/A - This is informational</p>
+                </div>
+            </div>
+        </div>
+<h2 class="phase-header">Web Phase</h2>
+
+        <div class="finding-card border-medium">
+            <div class="finding-header">
+                <div class="finding-title">Missing Security Header: Strict-Transport-Security</div>
+                <span class="badge medium">MEDIUM</span>
+            </div>
+            <div class="finding-body">
+                <div class="finding-section">
+                    <div class="section-title">Description</div>
+                    <p>HSTS header missing</p>
+                </div>
+                
+                <div class="finding-section">
+                    <div class="section-title">Remediation</div>
+                    <p>Implement HSTS to enforce HTTPS connections</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="finding-card border-medium">
+            <div class="finding-header">
+                <div class="finding-title">Missing Security Header: Content-Security-Policy</div>
+                <span class="badge medium">MEDIUM</span>
+            </div>
+            <div class="finding-body">
+                <div class="finding-section">
+                    <div class="section-title">Description</div>
+                    <p>CSP header missing</p>
+                </div>
+                
+                <div class="finding-section">
+                    <div class="section-title">Remediation</div>
+                    <p>Implement CSP to mitigate XSS and data injection attacks</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="finding-card border-low">
+            <div class="finding-header">
+                <div class="finding-title">Missing Security Header: X-Content-Type-Options</div>
+                <span class="badge low">LOW</span>
+            </div>
+            <div class="finding-body">
+                <div class="finding-section">
+                    <div class="section-title">Description</div>
+                    <p>X-Content-Type-Options header missing</p>
+                </div>
+                
+                <div class="finding-section">
+                    <div class="section-title">Remediation</div>
+                    <p>Set X-Content-Type-Options: nosniff</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="finding-card border-medium">
+            <div class="finding-header">
+                <div class="finding-title">Missing Security Header: X-Frame-Options</div>
+                <span class="badge medium">MEDIUM</span>
+            </div>
+            <div class="finding-body">
+                <div class="finding-section">
+                    <div class="section-title">Description</div>
+                    <p>X-Frame-Options header missing</p>
+                </div>
+                
+                <div class="finding-section">
+                    <div class="section-title">Remediation</div>
+                    <p>Set X-Frame-Options: DENY or SAMEORIGIN to prevent clickjacking</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="finding-card border-low">
+            <div class="finding-header">
+                <div class="finding-title">Missing Security Header: X-XSS-Protection</div>
+                <span class="badge low">LOW</span>
+            </div>
+            <div class="finding-body">
+                <div class="finding-section">
+                    <div class="section-title">Description</div>
+                    <p>X-XSS-Protection header missing</p>
+                </div>
+                
+                <div class="finding-section">
+                    <div class="section-title">Remediation</div>
+                    <p>Set X-XSS-Protection: 1; mode=block</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="finding-card border-low">
+            <div class="finding-header">
+                <div class="finding-title">Missing Security Header: Referrer-Policy</div>
+                <span class="badge low">LOW</span>
+            </div>
+            <div class="finding-body">
+                <div class="finding-section">
+                    <div class="section-title">Description</div>
+                    <p>Referrer-Policy header missing</p>
+                </div>
+                
+                <div class="finding-section">
+                    <div class="section-title">Remediation</div>
+                    <p>Implement Referrer-Policy header</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="finding-card border-low">
+            <div class="finding-header">
+                <div class="finding-title">Missing Security Header: Permissions-Policy</div>
+                <span class="badge low">LOW</span>
+            </div>
+            <div class="finding-body">
+                <div class="finding-section">
+                    <div class="section-title">Description</div>
+                    <p>Permissions-Policy header missing</p>
+                </div>
+                
+                <div class="finding-section">
+                    <div class="section-title">Remediation</div>
+                    <p>Implement Permissions-Policy header</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="finding-card border-high">
+            <div class="finding-header">
+                <div class="finding-title">Dangerous HTTP Method Allowed: OPTIONS</div>
+                <span class="badge high">HIGH</span>
+            </div>
+            <div class="finding-body">
+                <div class="finding-section">
+                    <div class="section-title">Description</div>
+                    <p>The server allows OPTIONS requests which could lead to security issues</p>
+                </div>
+                
+                <div class="finding-section">
+                    <div class="section-title">Remediation</div>
+                    <p>Disable OPTIONS method or restrict its usage</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="finding-card border-high">
+            <div class="finding-header">
+                <div class="finding-title">Dangerous HTTP Method Allowed: PATCH</div>
+                <span class="badge high">HIGH</span>
+            </div>
+            <div class="finding-body">
+                <div class="finding-section">
+                    <div class="section-title">Description</div>
+                    <p>The server allows PATCH requests which could lead to security issues</p>
+                </div>
+                
+                <div class="finding-section">
+                    <div class="section-title">Remediation</div>
+                    <p>Disable PATCH method or restrict its usage</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="finding-card border-low">
+            <div class="finding-header">
+                <div class="finding-title">Insecure Session Cookie</div>
+                <span class="badge low">LOW</span>
+            </div>
+            <div class="finding-body">
+                <div class="finding-section">
+                    <div class="section-title">Description</div>
+                    <p>Cookie 'request_id' lacks security flags: Missing Secure flag, Domain not specified</p>
+                </div>
+                
+                <div class="finding-section">
+                    <div class="section-title">Remediation</div>
+                    <p>Set Secure, HttpOnly flags and proper domain/path for session cookies</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="finding-card border-medium">
+            <div class="finding-header">
+                <div class="finding-title">Clickjacking Vulnerability</div>
+                <span class="badge medium">MEDIUM</span>
+            </div>
+            <div class="finding-body">
+                <div class="finding-section">
+                    <div class="section-title">Description</div>
+                    <p>X-Frame-Options header missing, site can be embedded in iframes</p>
+                </div>
+                
+                <div class="finding-section">
+                    <div class="section-title">Remediation</div>
+                    <p>Add X-Frame-Options: DENY or SAMEORIGIN header</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
