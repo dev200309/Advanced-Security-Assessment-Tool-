@@ -14,8 +14,8 @@ BANNER = f"""
  ║             ██║  ██║███████║██║  ██║   ██║                 ║
  ║             ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝   ╚═╝                 ║
  ║                                                            ║
- ║         Advanced Security Assessment Tool v{VERSION}       ║
- ║                  Happy Hacking by {AUTHOR}                 ║
+ ║           Advanced Security Assessment Tool v{VERSION}           ║
+ ║                Happy Hacking by {AUTHOR}                 ║
  ║                                                            ║
  ║  ░▒▓██████████████████████████████████████████████████▓▒░  ║
  ╚════════════════════════════════════════════════════════════╝
